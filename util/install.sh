@@ -199,6 +199,17 @@ function of {
     cd ~
 }
 
+function ovs_disable_controller {
+    # Switch can run on its own, but 
+    # Mininet should control the controller
+    if [ -e /etc/init.d/openvswitch-controller ]; then
+        if sudo service openvswitch-controller stop; then
+              echo "Stopped running controller"
+        fi
+        sudo update-rc.d openvswitch-controller disable
+    fi
+}
+
 # Install Open vSwitch
 # Instructions derived from OVS INSTALL, INSTALL.OpenFlow and README files.
 function ovs {
@@ -222,14 +233,7 @@ function ovs {
 	    # Annoyingly, things seem to be missing without this flag
             $pkginst --force-confmiss $pkg
         done
-        # Switch can run on its own, but 
-        # Mininet should control the controller
-	if [ -e /etc/init.d/openvswitch-controller ]; then
-            if sudo service openvswitch-controller stop; then
-                echo "Stopped running controller"
-            fi
-            sudo update-rc.d openvswitch-controller disable
-        fi
+        ovs_disable_controller
         echo "Done (hopefully) installing packages"
         cd ~
         return
@@ -237,7 +241,8 @@ function ovs {
 
     # Otherwise try distribution's OVS packages
     if [ "$DIST" = "Ubuntu" ] && [ `echo "$RELEASE >= 11.10" | bc` = 1 ]; then
-	if $install openvswitch-switch openvswitch-controller; then
+	if $install openvswitch-datapath-dkms openvswitch-switch openvswitch-controller; then
+            ovs_disable_controller
             return
         fi
     fi
@@ -293,7 +298,8 @@ function remove_ovs {
             s=$(basename $s)
             echo SCRIPT $s
             sudo service $s stop
-            sudo rm -f /etc/init.d/$s
+            # Removing this seems to break subsequent reinstalls
+            # sudo rm -f /etc/init.d/$s
             sudo update-rc.d -f $s remove
         done
     fi
