@@ -9,7 +9,9 @@ would be passed into the Mininet() constructor.
 from mininet.net import Mininet
 from mininet.node import Controller, OVSKernelSwitch, RemoteController
 from mininet.cli import CLI
+from mininet.link import TCLink
 from mininet.log import setLogLevel, debug
+from mininet.util import custom
 
 Switch = OVSKernelSwitch
 
@@ -48,7 +50,9 @@ def fullMeshMultiControllerNet(nswitches, nhosts_per_switch, ncontrollers):
         switch = net.addSwitch('s%d' % s_n,
                                controller = controller)
         for other in slist:
-            other.linkTo(switch)
+            #other.linkTo(switch)
+            link = custom(TCLink, bw=150)
+            other.linkTo(switch, link=link)
         slist.append(switch)
 
     print "*** Creating hosts"
