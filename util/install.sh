@@ -460,7 +460,9 @@ function all {
     oftest
     cbench
     other
-    echo "Please reboot, then run ./mininet/util/install.sh -c to remove unneeded packages."
+    if [ "$DIST" = "Ubuntu" ] && [ `expr $RELEASE '<' 12.04` = 1 ]; then
+        echo "Please reboot, then run ./mininet/util/install.sh -c to remove unneeded packages."
+    fi
     echo "Enjoy Mininet!"
 }
 
