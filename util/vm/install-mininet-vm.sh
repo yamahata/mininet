@@ -21,7 +21,7 @@ sudo apt-get -y install git-core openssh-server
 git clone git://github.com/mininet/mininet
 cd mininet
 # Currently install-precise; will change to testing or master
-git checkout -b 1.4 origin/devel/install-precise
+git checkout -b install-precise origin/devel/install-precise
 cd
 time mininet/util/install.sh
 if ! grep NOX_CORE_DIR .bashrc; then
