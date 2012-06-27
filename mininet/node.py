@@ -651,6 +651,12 @@ class OVSSwitch( Switch ):
         self.cmd( 'ovs-vsctl del-br ', self.dp )
         self.cmd( 'ovs-vsctl add-br', self.dp )
         self.cmd( 'ovs-vsctl set-fail-mode', self.dp, 'secure' )
+        # Set DPID (currently based on defaultMAC, will change in future)
+        if self.defaultMAC:
+            # OVS expects a string of exactly 16 hex digits with no colons
+            self.dpid = '0000' + ''.join( self.defaultMAC.split( ':' ) )
+            self.cmd( 'ovs-vsctl -- set Bridge', self.dp,
+                     'other_config:datapath-id=' + self.dpid )
         # Add ports
         ports = sorted( self.ports.values() )
         intfs = [ self.intfs[ port ] for port in ports ]
